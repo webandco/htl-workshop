@@ -8,6 +8,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     cat_pictures_directory: '%kernel.project_dir%/public/uploads/catPictures'
+    alancaptcha_site_key: '6ebfec3db0a4564d8386aeeeacb8a8cf7c75460a'
+    alancaptcha_api_key: '%env(ALANCAPTCHA_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -22,3 +24,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Form\CatFormType:
+        arguments:
+            $alancaptchaSiteKey: '%alancaptcha_site_key%'

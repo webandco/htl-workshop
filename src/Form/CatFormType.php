@@ -14,6 +14,8 @@ use Symfony\Component\Validator\Constraints\File;
 
 class CatFormType extends AbstractType
 {
+    public function __construct(private string $alancaptchaSiteKey) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -32,10 +34,15 @@ class CatFormType extends AbstractType
                     )
                 ]
             ])
+            ->add('alanCaptcha', AlanCaptchaType::class, [
+                'mapped' => false,
+                'label' => false,
+                'site_key' => $this->alancaptchaSiteKey,
+                'submit_button_id' => 'cat_form_save'
+            ])
             ->add('save', SubmitType::class, [
                 'label' => 'Add Cat'
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

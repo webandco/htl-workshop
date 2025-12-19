@@ -13,3 +13,8 @@
         </div>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://api.alancaptcha.com/widget/latest/widget.bundle.js"></script>
+{% endblock %}

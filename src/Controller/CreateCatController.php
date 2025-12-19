@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use AlanCaptcha\Php\AlanApi;
 
 class CreateCatController extends AbstractController
 {
@@ -34,6 +35,22 @@ class CreateCatController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $alanApi = new AlanApi();
+            $alanApiKey = $this->getParameter('alancaptcha_api_key');
+
+            try {
+                $captchaValid = $alanApi->widgetValidate($alanApiKey, $request->request->get('alan-solution'));
+            } catch (\Exception $e) {
+                $captchaValid = false;
+            }
+
+            if (!$captchaValid) {
+                $this->addFlash('danger', 'Captcha validation failed.');
+                return $this->render('page/create_cat.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+
             /** @var UploadedFile $pictureFile */
             $pictureFile = $form->get('picture')->getData();
 
@@ -48,7 +65,7 @@ class CreateCatController extends AbstractController
                     }
                     $pictureFile->move($this->catPicturesDirectory, $newFilename);
                 } catch (FileException $e) {
-                    $this->addFlash('error', 'Picture upload failed. Please try again.');
+                    $this->addFlash('danger', 'Picture upload failed. Please try again.');
                 }
 
                 $cat->setPictureFilename($newFilename);
